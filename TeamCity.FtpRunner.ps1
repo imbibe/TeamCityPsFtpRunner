@@ -35,6 +35,7 @@ $ftpUsername = [System.Xml.XPath.Extensions]::XPathSelectElement($buildPropertie
 $ftpPassword = [System.Xml.XPath.Extensions]::XPathSelectElement($buildPropertiesDoc, "/properties/entry[@key='ftpPassword']").Value;
 
 if([String]::IsNullOrEmpty($ftpBaseUrl)) {
+    writeTeamCityMessage ('Skipping FTP upload(s) because of missing ftpBaseUrl configuration parameter value...') $null 'WARNING';
     return;
 }
 
