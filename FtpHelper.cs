@@ -399,7 +399,10 @@ namespace FtpHelper
 			var url = this.ResolveRelativeUrl(relativeUrl);
 
 			var ftpRequest = (FtpWebRequest) WebRequest.Create(url);
-			ftpRequest.Credentials = new NetworkCredential(this.username, this.password);
+			
+			if(!string.IsNullOrEmpty(this.username)) {
+				ftpRequest.Credentials = new NetworkCredential(this.username, this.password);
+			}
 
 			ftpRequest.UsePassive = this.usePassiveMode;
 
