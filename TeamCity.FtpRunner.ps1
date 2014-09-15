@@ -54,6 +54,17 @@ if($ftpPathMappingsEl -ne $null) {
     $ftpPathMappings = $null;
 }
 
+$ftpSuspendUploads = $false;
+$ftpSuspendUploadsEl = [System.Xml.XPath.Extensions]::XPathSelectElement($buildPropertiesDoc, "/properties/entry[@key='ftpSuspendUploads']");
+if($ftpSuspendUploadsEl -ne $null) {
+    $ftpSuspendUploads = $ftpSuspendUploadsEl.Value.Equals("true");
+}
+if($ftpSuspendUploads -eq $true) {
+    writeTeamCityMessage ('Skipping FTP upload(s) because of uploads suspended via ftpSuspendUploads system parameter...') $null 'WARNING';
+    return;
+}
+
+
 $checkoutDir = $checkoutDir.Replace('\', '/');
 if($checkoutDir.EndsWith('/') -eq $false) {
     $checkoutDir = $checkoutDir + '/';
