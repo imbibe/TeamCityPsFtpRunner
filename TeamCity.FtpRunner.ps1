@@ -28,7 +28,7 @@ $ftpPassword = [System.Xml.XPath.Extensions]::XPathSelectElement($buildPropertie
 
 $ftpPathMappingsEl = [System.Xml.XPath.Extensions]::XPathSelectElement($buildPropertiesDoc, "/properties/entry[@key='ftpPathMappings']");
 if($ftpPathMappingsEl -ne $null) {
-    $ftpPathMappingsLines = $ftpPathMappingsEl.Value.Split(@("`r`n", "`r", "`n"), [System.StringSplitOptions]::RemoveEmptyEntries);
+    $ftpPathMappingsLines = $ftpPathMappingsEl.Value.Split(@("`r`n", "`r", "`n", ";"), [System.StringSplitOptions]::RemoveEmptyEntries);
     $ftpPathMappings = New-Object "System.Collections.Generic.Dictionary[string, string]";
     
     foreach($ftpPathMappingsLine in $ftpPathMappingsLines) {
@@ -65,15 +65,27 @@ foreach ($changedFile in $changedFiles)
     $resolvedSourcePath = $checkoutDir + $relativeSourcePath;
     
     $relativeDestPath = $relativeSourcePath;
-    if($ftpPathMappings -ne $null) {
+    if($ftpPathMappings -ne $null -band $ftpPathMappings.Count -gt 0) {
+        $found = $false;
         foreach ($pair in $ftpPathMappings.GetEnumerator()) {
             if($relativeDestPath.StartsWith($pair.Key) -eq $true) {
-                $relativeDestPath = $relativeDestPath.Replace($pair.Key, $pair.Value);
+                #This allows a ftpPathMapping of the form /=>/ which should usually be the last ftpPathMapping if it exists.
+                #Thus you can re-map specific folders and leave everything else mapped at default. If you specify ftpPathMappings but omit /=>/,
+                #any changed resource which does not satisfy one of the mappings won't be processed at all thus enabling you to selectively map your repo to FTP.
+                if($pair.Key.Length -gt 0) {
+                    $relativeDestPath = $relativeDestPath.Replace($pair.Key, $pair.Value);
+                }
+                
+                $found = $true;
                 break;
             }
         }
+        
+        if($found -eq $false) {
+            continue;
+        }
     }
-    
+
     Write-Host "##teamcity[blockOpened name=$resolvedSourcePath]";
     writeTeamCityMessage ('Processing:- ' + $resolvedSourcePath) $null 'NORMAL';
     
