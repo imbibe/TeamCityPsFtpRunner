@@ -3,7 +3,7 @@ $currentDir = Split-Path -parent $MyInvocation.MyCommand.Definition
 
 [System.Reflection.Assembly]::LoadWithPartialName("System.Xml.Linq") | Out-Null;
 
-$ftpHelperDefinition = [System.IO.File]::ReadAllText('FtpHelper.cs');
+$ftpHelperDefinition = [System.IO.File]::ReadAllText($currentDir + '\FtpHelper.cs');
 Add-Type -Language CSharp $ftpHelperDefinition;
 
 $isTeamCity = Test-Path Env:\BUILD_NUMBER;
@@ -13,7 +13,7 @@ if ($isTeamCity -eq $true) {
     $buildConfFile = 'C:\Users\Rahul Singla\Desktop\teamcity\teamcity.build8947796857307948281.properties - Copy.xml';
 }
 
-$buildPropertiesDoc = [System.Xml.Linq.XDocument]::Parse([System.IO.File]::ReadAllText($buildConfFile));
+$buildPropertiesDoc = [System.Xml.Linq.XDocument]::Parse([System.IO.File]::ReadAllText($buildConfFile + ".xml"));
 $changedFilePath = [System.Xml.XPath.Extensions]::XPathSelectElement($buildPropertiesDoc, "/properties/entry[@key='teamcity.build.changedFiles.file']").Value;
 $changedFileInfo = New-Object System.IO.FileInfo ($changedFilePath);
 if($changedFileInfo.Length -eq $null -or $changedFileInfo.Length -eq 0) {
