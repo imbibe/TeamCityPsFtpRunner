@@ -90,7 +90,7 @@ foreach ($changedFile in $changedFiles)
         }
     }
 
-    Write-Host "##teamcity[blockOpened name='$resolvedSourcePath']";
+    Write-Host "##teamcity[blockOpened name='$relativeSourcePath']";
     writeTeamCityMessage ('Processing:- ' + $resolvedSourcePath) $null 'NORMAL';
     
 	try {
@@ -148,5 +148,5 @@ foreach ($changedFile in $changedFiles)
         writeTeamCityMessage $_.Exception.Message $_.Exception.ToString() 'ERROR';
 	}
 
-    Write-Host "##teamcity[blockClosed name='$resolvedSourcePath']";
+    Write-Host "##teamcity[blockClosed name='$relativeSourcePath']";
 }
