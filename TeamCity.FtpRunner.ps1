@@ -26,6 +26,10 @@ $ftpBaseUrl = [System.Xml.XPath.Extensions]::XPathSelectElement($buildProperties
 $ftpUsername = [System.Xml.XPath.Extensions]::XPathSelectElement($buildPropertiesDoc, "/properties/entry[@key='ftpUsername']").Value;
 $ftpPassword = [System.Xml.XPath.Extensions]::XPathSelectElement($buildPropertiesDoc, "/properties/entry[@key='ftpPassword']").Value;
 
+if([String]::IsNullOrEmpty($ftpBaseUrl)) {
+    return;
+}
+
 $ftpPathMappingsEl = [System.Xml.XPath.Extensions]::XPathSelectElement($buildPropertiesDoc, "/properties/entry[@key='ftpPathMappings']");
 if($ftpPathMappingsEl -ne $null) {
     $ftpPathMappingsLines = $ftpPathMappingsEl.Value.Split(@("`r`n", "`r", "`n", ";"), [System.StringSplitOptions]::RemoveEmptyEntries);
