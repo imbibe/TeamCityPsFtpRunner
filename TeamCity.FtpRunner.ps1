@@ -166,6 +166,8 @@ foreach ($changedFile in $changedFiles)
 
 	} catch [Exception] {
         writeTeamCityMessage $_.Exception.Message $_.Exception.ToString() 'ERROR';
+		#If errorDetails is multi-line, TeamCity's handling of the message won't cause build to fail. So explicitly log a single-line error detail.
+        writeTeamCityMessage ('File sync failed with error.') $_.Exception.Message 'ERROR';
 	}
 
     Write-Host "##teamcity[blockClosed name='$relativeSourcePath']";
