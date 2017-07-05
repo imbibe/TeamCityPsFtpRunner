@@ -208,13 +208,14 @@ namespace FtpHelper
 			}
 		}
 
-		public void UploadFile (string relativeFileUrl, string sourceFilePath, bool overwrite = true, bool ignoreErrors = false)
+		public void UploadFile (string relativeFileUrl, string sourceFilePath, bool overwrite = true, bool ensureDirectoryTree = true, bool ignoreErrors = false)
 		{
 			try
 			{
 				using (var fs = File.OpenRead(sourceFilePath))
 				{
 					this.UploadFile(relativeFileUrl, fs,
+						ensureDirectoryTree: ensureDirectoryTree,
 						overwrite: overwrite,
 						ignoreErrors: ignoreErrors);
 				}
@@ -312,6 +313,12 @@ namespace FtpHelper
 						using (var streamReader = new StreamReader(responseStream))
 						{
 							var s = streamReader.ReadToEnd();
+							if (string.IsNullOrEmpty(s))
+							{
+								//An empty response for ListDirectory indicates the directory does not exist.
+								throw new Exception(string.Format("Directory does not exist:- {0}", relativeDirUrl));
+							}
+
 							return (s.Split(new string[] { "\r\n", "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries));
 						}
 					}
